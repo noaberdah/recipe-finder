@@ -1,11 +1,20 @@
+let lastSearchResults = [];
+let lastSearchQuery = "";
+
 async function searchRecipes() {
   const query = document.getElementById("searchInput").value;
   const container = document.getElementById("recipes");
 
   container.innerHTML = "⏳ Loading...";
 
-  const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`);
+  const res = await fetch(
+    `https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`
+  );
+
   const data = await res.json();
+
+  lastSearchResults = data.meals;   // 💾 SAVE RESULTS
+  lastSearchQuery = query;          // 💾 SAVE QUERY
 
   displayRecipes(data.meals);
 }
@@ -37,14 +46,15 @@ function displayRecipes(meals) {
 async function showRecipe(id) {
   const container = document.getElementById("recipes");
 
-  container.innerHTML = "⏳ Loading recipe...";
+  container.innerHTML = "⏳ Loading...";
 
-  const res = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
+  const res = await fetch(
+    `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`
+  );
+
   const data = await res.json();
-
   const meal = data.meals[0];
 
-  // extract ingredients
   const ingredients = [];
 
   for (let i = 1; i <= 20; i++) {
@@ -55,18 +65,26 @@ async function showRecipe(id) {
   }
 
   container.innerHTML = `
-    <h2>${meal.strMeal}</h2>
-    <img src="${meal.strMealThumb}" width="250">
+    <div class="recipe-details">
 
-    <h3>Ingredients:</h3>
-    <ul>
-      ${ingredients.map(i => `<li>${i}</li>`).join("")}
-    </ul>
+      <h2>${meal.strMeal}</h2>
 
-    <h3>Instructions:</h3>
-    <p>${meal.strInstructions}</p>
+      <img src="${meal.strMealThumb}" />
 
-    <br>
-    <button onclick="location.reload()">⬅ Back</button>
+      <h3>Ingredients:</h3>
+      <ul>
+        ${ingredients.map(i => `<li>${i}</li>`).join("")}
+      </ul>
+
+      <h3>Instructions:</h3>
+      <p>${meal.strInstructions}</p>
+
+      <button onclick="showSearchResultsAgain()">⬅ Back</button>
+
+    </div>
   `;
+}
+
+function showSearchResultsAgain() {
+  displayRecipes(lastSearchResults);
 }
