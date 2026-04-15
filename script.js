@@ -1,5 +1,8 @@
 async function searchRecipes() {
   const query = document.getElementById("searchInput").value;
+  const container = document.getElementById("recipes");
+
+  container.innerHTML = "⏳ Loading...";
 
   const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`);
   const data = await res.json();
@@ -8,11 +11,14 @@ async function searchRecipes() {
 }
 
 function displayRecipes(meals) {
+  
   const container = document.getElementById("recipes");
   container.innerHTML = "";
 
+  console.log("API response:", meals); // 👈 IMPORTANT DEBUG LINE
+
   if (!meals) {
-    container.innerHTML = "<p>No recipes found 😢</p>";
+    container.innerHTML = "<p>❌ No recipes found</p>";
     return;
   }
 
